@@ -3,636 +3,1118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>To-do</title>
+  <title>명화 배경화면 · Public Art Wallpaper</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    :root {
+      --bg: #0d0b14;
+      --bg-2: #161324;
+      --panel: rgba(255,255,255,0.04);
+      --panel-2: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.08);
+      --border-2: rgba(255,255,255,0.16);
+      --text: #ece9f5;
+      --muted: #8a86a3;
+      --gold: #d4a857;
+      --gold-2: #f0c97a;
+    }
+
+    html, body { height: 100%; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+      background: radial-gradient(1200px 700px at 10% -10%, #1e1733 0%, transparent 60%),
+                  radial-gradient(900px 700px at 100% 10%, #1b1228 0%, transparent 60%),
+                  var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 32px 16px;
     }
 
     /* 헤더 */
     .app-header {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 20px 20px;
       text-align: center;
-      margin-bottom: 32px;
     }
 
     .app-header h1 {
       font-size: 2.2rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #f0c97a, #d4a857 40%, #b07ad6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing: -0.5px;
     }
 
     .app-header .subtitle {
-      font-size: 0.85rem;
-      color: #8888aa;
-      margin-top: 6px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 8px;
     }
 
-    /* 입력 영역 */
-    .input-area {
-      display: flex;
-      gap: 10px;
-      max-width: 520px;
-      margin: 0 auto 36px;
-    }
-
-    .input-area input {
-      flex: 1;
-      padding: 14px 18px;
-      border: 2px solid rgba(102, 126, 234, 0.3);
-      border-radius: 12px;
-      font-size: 1rem;
-      outline: none;
-      background: rgba(255,255,255,0.06);
-      color: #e0e0e0;
-      transition: all 0.25s;
-    }
-
-    .input-area input::placeholder { color: #666680; }
-    .input-area input:focus {
-      border-color: #667eea;
-      background: rgba(255,255,255,0.1);
-      box-shadow: 0 0 20px rgba(102, 126, 234, 0.15);
-    }
-
-    .input-area button {
-      padding: 14px 24px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.25s;
-      white-space: nowrap;
-    }
-
-    .input-area button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
-    }
-
-    .input-area button:active { transform: translateY(0); }
-
-    /* 칸반 보드 */
-    .board {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      max-width: 1140px;
-      margin: 0 auto;
-    }
-
-    .column {
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 18px;
-      min-height: 280px;
-      display: flex;
-      flex-direction: column;
-      transition: all 0.25s;
-    }
-
-    .column.drop-active {
-      border-color: #667eea;
-      background: rgba(102, 126, 234, 0.08);
-      box-shadow: 0 0 30px rgba(102, 126, 234, 0.12);
-    }
-
-    .column-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      padding: 0 4px;
-    }
-
-    .column-title {
-      font-weight: 700;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
+    .badge-row {
+      display: inline-flex;
       gap: 8px;
-      color: #ccc;
+      margin-top: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .badge {
+      font-size: 0.72rem;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(212, 168, 87, 0.1);
+      border: 1px solid rgba(212, 168, 87, 0.25);
+      color: var(--gold-2);
+      letter-spacing: 0.3px;
     }
 
-    .column-title .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-
-    .column[data-status="todo"] .dot { background: #667eea; box-shadow: 0 0 8px rgba(102, 126, 234, 0.5); }
-    .column[data-status="doing"] .dot { background: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
-    .column[data-status="done"] .dot { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
-
-    .column-count {
-      background: rgba(255,255,255,0.08);
-      border-radius: 10px;
-      padding: 3px 10px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #888;
-    }
-
-    /* 카드 */
-    .card-list {
-      list-style: none;
+    /* 컨트롤 영역 */
+    .controls {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 8px 20px 22px;
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      flex: 1;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
     }
 
-    .card {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 16px;
-      cursor: grab;
-      transition: all 0.2s;
+    .search-box {
+      flex: 1 1 320px;
+      max-width: 480px;
       position: relative;
     }
 
-    .card:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.15);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    }
-
-    .card:active { cursor: grabbing; }
-
-    .card.dragging {
-      opacity: 0.4;
-      transform: scale(0.95) rotate(2deg);
-    }
-
-    .card .card-text {
+    .search-box input {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
       font-size: 0.95rem;
-      line-height: 1.5;
-      word-break: break-word;
-      margin-bottom: 12px;
-      color: #ddd;
+      outline: none;
+      transition: all 0.2s;
     }
 
-    .card-meta {
-      font-size: 0.72rem;
-      color: #666;
-      margin-bottom: 10px;
+    .search-box input::placeholder { color: #5d5a73; }
+    .search-box input:focus {
+      border-color: var(--gold);
+      background: rgba(212, 168, 87, 0.06);
     }
 
-    .card-actions {
+    .search-box::before {
+      content: "🔍";
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.55;
+      font-size: 0.95rem;
+    }
+
+    .filter-pills {
       display: flex;
-      gap: 4px;
-      align-items: center;
-      justify-content: space-between;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
-    .move-buttons {
-      display: flex;
-      gap: 5px;
-    }
-
-    .move-btn {
-      border: none;
-      border-radius: 8px;
-      padding: 5px 12px;
-      font-size: 0.73rem;
-      font-weight: 700;
+    .pill {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: #c7c3da;
+      font-size: 0.82rem;
       cursor: pointer;
       transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .pill:hover {
+      border-color: var(--border-2);
+      background: var(--panel-2);
+    }
+
+    .pill.active {
+      background: linear-gradient(135deg, rgba(212, 168, 87, 0.25), rgba(176, 122, 214, 0.25));
+      border-color: rgba(212, 168, 87, 0.5);
       color: #fff;
     }
 
-    .move-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    /* 갤러리 */
+    .gallery {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 4px 20px 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
     }
 
-    .move-btn.to-todo { background: linear-gradient(135deg, #667eea, #5a6fd6); }
-    .move-btn.to-doing { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .move-btn.to-done { background: linear-gradient(135deg, #10b981, #059669); }
-
-    .delete-btn {
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-      color: #555;
+    .art-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
       cursor: pointer;
-      padding: 4px 8px;
-      line-height: 1;
-      transition: all 0.2s;
-      border-radius: 6px;
+      transition: all 0.25s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
     }
 
-    .delete-btn:hover {
-      color: #ef4444;
-      background: rgba(239, 68, 68, 0.1);
+    .art-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(212, 168, 87, 0.4);
+      box-shadow: 0 14px 40px rgba(0,0,0,0.45);
     }
 
-    .empty-state {
+    .art-thumb {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      background: linear-gradient(135deg, #1a1428, #0a0810);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .art-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .art-thumb img.loaded { opacity: 1; }
+
+    .art-thumb::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.65));
+      pointer-events: none;
+    }
+
+    .thumb-status {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #6a6584;
+      font-size: 0.75rem;
       text-align: center;
-      padding: 40px 8px;
-      color: #555;
-      font-size: 0.85rem;
-      flex: 1;
+      padding: 12px;
+      pointer-events: none;
+    }
+    .thumb-status.hidden { display: none; }
+
+    .thumb-spinner {
+      width: 26px;
+      height: 26px;
+      border: 2px solid rgba(212, 168, 87, 0.2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .thumb-error-icon {
+      font-size: 1.4rem;
+      opacity: 0.5;
+    }
+
+    .art-info {
+      padding: 12px 14px 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .art-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f1eddf;
+      margin-bottom: 3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .art-artist {
+      font-size: 0.78rem;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .fav-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(6px);
+      color: #ddd;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 2;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    /* 커스텀 삭제 확인 모달 */
+    .fav-btn:hover { transform: scale(1.1); background: rgba(0,0,0,0.7); }
+    .fav-btn.active { color: #ff6b8a; background: rgba(255, 107, 138, 0.18); }
+
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    /* 모달 */
     .modal-overlay {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
+      inset: 0;
+      background: rgba(5, 3, 12, 0.85);
+      backdrop-filter: blur(8px);
       z-index: 1000;
-      justify-content: center;
       align-items: center;
-      animation: fadeIn 0.2s ease;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
     }
 
-    .modal-overlay.active {
-      display: flex;
-    }
+    .modal-overlay.active { display: flex; }
 
     .modal {
-      background: linear-gradient(145deg, #1e1b3a, #2a2650);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: linear-gradient(160deg, #1a1426, #221a35);
+      border: 1px solid var(--border-2);
       border-radius: 20px;
-      padding: 32px;
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+      max-width: 980px;
+      width: 100%;
+      max-height: 92vh;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 320px;
       animation: modalIn 0.25s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
     @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.9) translateY(10px); }
+      from { opacity: 0; transform: scale(0.96) translateY(8px); }
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    .modal-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: rgba(239, 68, 68, 0.15);
+    .preview-pane {
+      background: #0a0810;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 18px;
-      font-size: 1.6rem;
+      padding: 30px;
+      min-height: 460px;
+      position: relative;
     }
 
-    .modal h2 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #e0e0e0;
-      margin-bottom: 10px;
+    .device-frame {
+      position: relative;
+      transition: all 0.35s ease;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+      border-radius: 28px;
+      overflow: hidden;
+      background: #000;
     }
 
-    .modal p {
-      font-size: 0.9rem;
-      color: #888;
-      margin-bottom: 6px;
+    .device-frame.phone {
+      width: 220px;
+      height: 460px;
+      border-radius: 32px;
+      border: 6px solid #1a1620;
+    }
+
+    .device-frame.tablet {
+      width: 380px;
+      height: 500px;
+      border-radius: 18px;
+      border: 8px solid #1a1620;
+    }
+
+    .device-frame.desktop {
+      width: 520px;
+      height: 320px;
+      border-radius: 10px;
+      border: 6px solid #1a1620;
+    }
+
+    .device-wallpaper {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-color: #0a0810;
+    }
+
+    .device-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+
+    .device-overlay .clock {
+      margin-top: 14%;
+      font-size: 2rem;
+      font-weight: 200;
+      letter-spacing: 1px;
+    }
+
+    .device-overlay .date {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    .device-frame.tablet .clock { font-size: 2.4rem; margin-top: 10%; }
+    .device-frame.desktop .clock { display: none; }
+
+    .info-pane {
+      padding: 26px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+    }
+    .modal-close:hover { background: rgba(0,0,0,0.8); }
+
+    .info-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #f3eedf;
+      line-height: 1.3;
+    }
+
+    .info-artist {
+      font-size: 0.95rem;
+      color: var(--gold-2);
+      margin-top: 2px;
+    }
+
+    .info-meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 6px;
       line-height: 1.5;
     }
 
-    .modal .todo-text-preview {
-      background: rgba(255,255,255,0.06);
-      border-radius: 10px;
-      padding: 10px 16px;
-      margin: 14px 0 24px;
-      font-size: 0.92rem;
-      color: #bbb;
-      word-break: break-word;
-      border-left: 3px solid #ef4444;
+    .info-desc {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #b8b3cd;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.03);
+      border-left: 2px solid var(--gold);
+      border-radius: 6px;
     }
 
-    .modal-buttons {
+    .section-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .device-tabs {
       display: flex;
-      gap: 10px;
-      justify-content: center;
+      gap: 6px;
     }
 
-    .modal-btn {
-      padding: 11px 28px;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 700;
+    .device-tab {
+      flex: 1;
+      padding: 9px 6px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: #c7c3da;
+      font-size: 0.78rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .modal-btn.cancel {
-      background: rgba(255,255,255,0.08);
-      color: #aaa;
-    }
-
-    .modal-btn.cancel:hover {
-      background: rgba(255,255,255,0.14);
-      color: #ccc;
-    }
-
-    .modal-btn.confirm {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
+    .device-tab.active {
+      border-color: var(--gold);
+      background: rgba(212, 168, 87, 0.15);
       color: #fff;
     }
 
-    .modal-btn.confirm:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-    }
-
-    /* 통계 바 */
-    .stats-bar {
+    .actions {
       display: flex;
-      justify-content: center;
-      gap: 24px;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 9px;
+      margin-top: auto;
     }
 
-    .stat-item {
+    .action-btn {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 11px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 0.82rem;
-      color: #777;
+      justify-content: center;
+      gap: 8px;
     }
 
-    .stat-item .stat-num {
-      font-weight: 800;
-      font-size: 1.1rem;
-      color: #aaa;
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--gold), #b07ad6);
+      color: #1a1020;
+    }
+    .action-btn.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(212, 168, 87, 0.35);
+    }
+
+    .action-btn.secondary {
+      background: var(--panel-2);
+      color: #ddd;
+      border: 1px solid var(--border);
+    }
+    .action-btn.secondary:hover { background: rgba(255,255,255,0.12); }
+
+    .help-text {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* 토스트 */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(20, 16, 30, 0.95);
+      border: 1px solid var(--border-2);
+      padding: 12px 22px;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.88rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s;
+      z-index: 2000;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     /* 반응형 */
-    @media (max-width: 768px) {
-      .board {
+    @media (max-width: 820px) {
+      .modal {
         grid-template-columns: 1fr;
-        max-width: 520px;
+        max-height: 95vh;
       }
-      .column { min-height: 140px; }
+      .preview-pane {
+        min-height: 360px;
+        padding: 20px;
+      }
+      .device-frame.phone { width: 180px; height: 360px; }
+      .device-frame.tablet { width: 280px; height: 360px; }
+      .device-frame.desktop { width: 360px; height: 220px; }
+      .info-pane { padding: 18px; }
+    }
+
+    @media (max-width: 480px) {
       .app-header h1 { font-size: 1.7rem; }
+      .gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 4px 14px 60px;
+      }
+      .art-title { font-size: 0.85rem; }
+      .art-artist { font-size: 0.72rem; }
     }
   </style>
 </head>
 <body>
-  <div class="app-header">
-    <h1>To-do</h1>
-    <div class="subtitle">드래그 앤 드롭으로 할 일을 관리하세요</div>
-  </div>
-
-  <div class="stats-bar" id="statsBar">
-    <div class="stat-item">전체 <span class="stat-num" id="statTotal">0</span></div>
-    <div class="stat-item">할 일 <span class="stat-num" id="statTodo">0</span></div>
-    <div class="stat-item">진행중 <span class="stat-num" id="statDoing">0</span></div>
-    <div class="stat-item">완료 <span class="stat-num" id="statDone">0</span></div>
-  </div>
-
-  <div class="input-area">
-    <input type="text" id="todoInput" placeholder="새로운 할 일을 입력하세요" autofocus>
-    <button onclick="addTodo()">추가</button>
-  </div>
-
-  <div class="board" id="board">
-    <div class="column" data-status="todo">
-      <div class="column-header">
-        <span class="column-title"><span class="dot"></span>할 일</span>
-        <span class="column-count" data-count="todo">0</span>
-      </div>
-      <ul class="card-list" data-status="todo"></ul>
+  <header class="app-header">
+    <h1>명화 배경화면</h1>
+    <div class="subtitle">퍼블릭 도메인 해외 명화를 휴대폰과 태블릿 배경으로</div>
+    <div class="badge-row">
+      <span class="badge">CC0 / Public Domain</span>
+      <span class="badge">고해상도 다운로드</span>
+      <span class="badge">상업적 이용 가능</span>
     </div>
-    <div class="column" data-status="doing">
-      <div class="column-header">
-        <span class="column-title"><span class="dot"></span>진행중</span>
-        <span class="column-count" data-count="doing">0</span>
-      </div>
-      <ul class="card-list" data-status="doing"></ul>
+  </header>
+
+  <div class="controls">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="작품·작가명으로 검색 (예: 별이 빛나는 밤, Van Gogh)">
     </div>
-    <div class="column" data-status="done">
-      <div class="column-header">
-        <span class="column-title"><span class="dot"></span>완료</span>
-        <span class="column-count" data-count="done">0</span>
-      </div>
-      <ul class="card-list" data-status="done"></ul>
-    </div>
+    <div class="filter-pills" id="filterPills"></div>
   </div>
 
-  <!-- 삭제 확인 모달 -->
-  <div class="modal-overlay" id="deleteModal">
+  <div class="gallery" id="gallery"></div>
+
+  <!-- 작품 상세 모달 -->
+  <div class="modal-overlay" id="modal">
     <div class="modal">
-      <div class="modal-icon">🗑️</div>
-      <h2>할 일을 삭제할까요?</h2>
-      <p>이 항목은 삭제 후 복구할 수 없습니다.</p>
-      <div class="todo-text-preview" id="deletePreview"></div>
-      <div class="modal-buttons">
-        <button class="modal-btn cancel" onclick="closeDeleteModal()">취소</button>
-        <button class="modal-btn confirm" onclick="confirmDelete()">삭제</button>
+      <div class="preview-pane">
+        <button class="modal-close" id="modalClose" title="닫기">×</button>
+        <div class="device-frame phone" id="deviceFrame">
+          <div class="device-wallpaper" id="deviceWallpaper"></div>
+          <div class="device-overlay">
+            <div class="clock" id="previewClock">9:41</div>
+            <div class="date" id="previewDate"></div>
+          </div>
+        </div>
+      </div>
+      <div class="info-pane">
+        <div>
+          <div class="info-title" id="infoTitle"></div>
+          <div class="info-artist" id="infoArtist"></div>
+          <div class="info-meta" id="infoMeta"></div>
+        </div>
+        <div class="info-desc" id="infoDesc"></div>
+
+        <div>
+          <div class="section-label">미리보기 기기</div>
+          <div class="device-tabs">
+            <button class="device-tab active" data-device="phone">📱 휴대폰</button>
+            <button class="device-tab" data-device="tablet">📲 태블릿</button>
+            <button class="device-tab" data-device="desktop">🖥️ 데스크탑</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="action-btn primary" id="downloadBtn">⬇ 원본 다운로드</button>
+          <button class="action-btn secondary" id="viewOriginalBtn">🔗 원본 페이지 열기</button>
+          <div class="help-text">다운로드한 이미지를 사진/갤러리 앱에서 열고 ‘배경화면으로 설정’을 선택하세요.</div>
+        </div>
       </div>
     </div>
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <script>
-    /* 데이터 */
-    function loadTodos() {
-      const raw = JSON.parse(localStorage.getItem('todos_kwonsik') || '[]');
-      return raw.map(t => ({
-        id: t.id,
-        text: t.text,
-        status: t.status || (t.done ? 'done' : 'todo'),
-        createdAt: t.createdAt || t.id
-      }));
-    }
-
-    // 이전 데이터 마이그레이션
-    if (!localStorage.getItem('todos_kwonsik') && localStorage.getItem('todos')) {
-      localStorage.setItem('todos_kwonsik', localStorage.getItem('todos'));
-    }
-
-    let todos = loadTodos();
-    const input = document.getElementById('todoInput');
-    const STATUSES = ['todo', 'doing', 'done'];
-    let pendingDeleteId = null;
-
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') addTodo();
-    });
-
-    function save() {
-      localStorage.setItem('todos_kwonsik', JSON.stringify(todos));
-    }
-
-    function addTodo() {
-      const text = input.value.trim();
-      if (!text) return;
-      todos.push({ id: Date.now(), text, status: 'todo', createdAt: Date.now() });
-      input.value = '';
-      save();
-      render();
-    }
-
-    function moveTo(id, status) {
-      const todo = todos.find(t => t.id === id);
-      if (todo) todo.status = status;
-      save();
-      render();
-    }
-
-    /* 삭제 모달 */
-    function remove(id) {
-      const todo = todos.find(t => t.id === id);
-      if (!todo) return;
-      pendingDeleteId = id;
-      document.getElementById('deletePreview').textContent = todo.text;
-      document.getElementById('deleteModal').classList.add('active');
-    }
-
-    function closeDeleteModal() {
-      document.getElementById('deleteModal').classList.remove('active');
-      pendingDeleteId = null;
-    }
-
-    function confirmDelete() {
-      if (pendingDeleteId !== null) {
-        todos = todos.filter(t => t.id !== pendingDeleteId);
-        save();
-        render();
+    /* 작품 데이터 — 모두 퍼블릭 도메인 (작가 사후 100년 이상 경과) */
+    /* 이미지: Wikimedia Commons 직접 링크, 출처 페이지: Commons 또는 위키피디아 */
+    const ARTWORKS = [
+      {
+        id: 'starry-night',
+        title: '별이 빛나는 밤',
+        titleEn: 'The Starry Night',
+        artist: 'Vincent van Gogh',
+        year: 1889,
+        category: 'post-impressionism',
+        desc: '소용돌이치는 밤하늘과 사이프러스 나무가 인상적인, 반 고흐의 가장 유명한 작품 중 하나.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/640px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/2560px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg'
+      },
+      {
+        id: 'sunflowers',
+        title: '해바라기',
+        titleEn: 'Sunflowers',
+        artist: 'Vincent van Gogh',
+        year: 1888,
+        category: 'post-impressionism',
+        desc: '강렬한 노랑으로 빛나는 반 고흐의 대표적 정물화 시리즈.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Vincent_Willem_van_Gogh_127.jpg/640px-Vincent_Willem_van_Gogh_127.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Vincent_Willem_van_Gogh_127.jpg/2048px-Vincent_Willem_van_Gogh_127.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Vincent_Willem_van_Gogh_127.jpg'
+      },
+      {
+        id: 'almond-blossom',
+        title: '꽃 피는 아몬드 나무',
+        titleEn: 'Almond Blossoms',
+        artist: 'Vincent van Gogh',
+        year: 1890,
+        category: 'post-impressionism',
+        desc: '조카 탄생을 축하하며 그린 작품. 푸른 하늘에 흰 아몬드꽃이 가득하다.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Vincent_van_Gogh_-_Almond_blossom_-_Google_Art_Project.jpg/640px-Vincent_van_Gogh_-_Almond_blossom_-_Google_Art_Project.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Vincent_van_Gogh_-_Almond_blossom_-_Google_Art_Project.jpg/2560px-Vincent_van_Gogh_-_Almond_blossom_-_Google_Art_Project.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Almond_blossom_-_Google_Art_Project.jpg'
+      },
+      {
+        id: 'cafe-terrace',
+        title: '밤의 카페 테라스',
+        titleEn: 'Café Terrace at Night',
+        artist: 'Vincent van Gogh',
+        year: 1888,
+        category: 'post-impressionism',
+        desc: '아를의 밤거리, 노란 카페 조명과 별이 빛나는 푸른 하늘의 대비가 아름다운 작품.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Vincent_van_Gogh_-_Cafe_Terrace_at_Night_%28Yorck%29.jpg/640px-Vincent_van_Gogh_-_Cafe_Terrace_at_Night_%28Yorck%29.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Vincent_van_Gogh_-_Cafe_Terrace_at_Night_%28Yorck%29.jpg/2048px-Vincent_van_Gogh_-_Cafe_Terrace_at_Night_%28Yorck%29.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Cafe_Terrace_at_Night_(Yorck).jpg'
+      },
+      {
+        id: 'wheatfield-cypresses',
+        title: '사이프러스가 있는 밀밭',
+        titleEn: 'Wheat Field with Cypresses',
+        artist: 'Vincent van Gogh',
+        year: 1889,
+        category: 'post-impressionism',
+        desc: '바람에 흔들리는 밀밭과 사이프러스, 그리고 구름이 빚어내는 운동감.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Vincent_van_Gogh_-_Wheat_Field_with_Cypresses_-_Google_Art_Project.jpg/640px-Vincent_van_Gogh_-_Wheat_Field_with_Cypresses_-_Google_Art_Project.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Vincent_van_Gogh_-_Wheat_Field_with_Cypresses_-_Google_Art_Project.jpg/2560px-Vincent_van_Gogh_-_Wheat_Field_with_Cypresses_-_Google_Art_Project.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Wheat_Field_with_Cypresses_-_Google_Art_Project.jpg'
+      },
+      {
+        id: 'impression-sunrise',
+        title: '인상, 해돋이',
+        titleEn: 'Impression, Sunrise',
+        artist: 'Claude Monet',
+        year: 1872,
+        category: 'impressionism',
+        desc: '“인상주의” 운동의 이름이 유래한 바로 그 작품. 르 아브르 항구의 새벽.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Monet_-_Impression%2C_Sunrise.jpg/640px-Monet_-_Impression%2C_Sunrise.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Monet_-_Impression%2C_Sunrise.jpg/2048px-Monet_-_Impression%2C_Sunrise.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Monet_-_Impression,_Sunrise.jpg'
+      },
+      {
+        id: 'water-lilies',
+        title: '수련',
+        titleEn: 'Water Lilies',
+        artist: 'Claude Monet',
+        year: 1916,
+        category: 'impressionism',
+        desc: '지베르니의 정원 연못에서 영감을 받은 모네 말년의 대표 연작.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Monet_Water_Lilies_1916.jpg/640px-Monet_Water_Lilies_1916.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Monet_Water_Lilies_1916.jpg/2048px-Monet_Water_Lilies_1916.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Monet_Water_Lilies_1916.jpg'
+      },
+      {
+        id: 'girl-pearl-earring',
+        title: '진주 귀걸이를 한 소녀',
+        titleEn: 'Girl with a Pearl Earring',
+        artist: 'Johannes Vermeer',
+        year: 1665,
+        category: 'baroque',
+        desc: '“북유럽의 모나리자”로 불리는 베르메르의 신비로운 초상화.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/640px-1665_Girl_with_a_Pearl_Earring.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/2048px-1665_Girl_with_a_Pearl_Earring.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:1665_Girl_with_a_Pearl_Earring.jpg'
+      },
+      {
+        id: 'milkmaid',
+        title: '우유 따르는 여인',
+        titleEn: 'The Milkmaid',
+        artist: 'Johannes Vermeer',
+        year: 1658,
+        category: 'baroque',
+        desc: '창가의 빛이 흐르는 가운데 단순한 일상 동작을 성스럽게 표현한 걸작.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg/640px-Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg/2048px-Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg'
+      },
+      {
+        id: 'great-wave',
+        title: '가나가와 해변의 큰 파도',
+        titleEn: 'The Great Wave off Kanagawa',
+        artist: 'Katsushika Hokusai',
+        year: 1831,
+        category: 'ukiyo-e',
+        desc: '거대한 파도와 후지산이 어우러진 호쿠사이의 우키요에 대표작.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/The_Great_Wave_off_Kanagawa.jpg/640px-The_Great_Wave_off_Kanagawa.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/The_Great_Wave_off_Kanagawa.jpg/2560px-The_Great_Wave_off_Kanagawa.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:The_Great_Wave_off_Kanagawa.jpg'
+      },
+      {
+        id: 'red-fuji',
+        title: '붉은 후지산 (개풍쾌청)',
+        titleEn: 'Fine Wind, Clear Morning',
+        artist: 'Katsushika Hokusai',
+        year: 1831,
+        category: 'ukiyo-e',
+        desc: '맑은 새벽, 붉게 물든 후지산의 장엄한 모습을 담은 우키요에.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Red_Fuji_southern_wind_clear_morning.jpg/640px-Red_Fuji_southern_wind_clear_morning.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Red_Fuji_southern_wind_clear_morning.jpg/2048px-Red_Fuji_southern_wind_clear_morning.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Red_Fuji_southern_wind_clear_morning.jpg'
+      },
+      {
+        id: 'the-kiss',
+        title: '키스',
+        titleEn: 'The Kiss',
+        artist: 'Gustav Klimt',
+        year: 1908,
+        category: 'symbolism',
+        desc: '금빛으로 빛나는 클림트의 황금기를 대표하는 상징주의 걸작.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg/640px-The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg/2048px-The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg'
+      },
+      {
+        id: 'the-scream',
+        title: '절규',
+        titleEn: 'The Scream',
+        artist: 'Edvard Munch',
+        year: 1893,
+        category: 'symbolism',
+        desc: '현대인의 불안을 가장 강렬하게 표현한 표현주의의 시초적 작품.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg/640px-Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg/2048px-Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg'
+      },
+      {
+        id: 'mona-lisa',
+        title: '모나리자',
+        titleEn: 'Mona Lisa',
+        artist: 'Leonardo da Vinci',
+        year: 1503,
+        category: 'renaissance',
+        desc: '세상에서 가장 유명한 초상화. 신비로운 미소로 알려진 르네상스 걸작.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/640px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/2048px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg'
+      },
+      {
+        id: 'birth-of-venus',
+        title: '비너스의 탄생',
+        titleEn: 'The Birth of Venus',
+        artist: 'Sandro Botticelli',
+        year: 1485,
+        category: 'renaissance',
+        desc: '바다에서 태어난 비너스가 조개 위에 서 있는 르네상스 신화화의 정점.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/640px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/2560px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg'
+      },
+      {
+        id: 'arnolfini',
+        title: '아르놀피니 부부의 초상',
+        titleEn: 'The Arnolfini Portrait',
+        artist: 'Jan van Eyck',
+        year: 1434,
+        category: 'renaissance',
+        desc: '북유럽 르네상스의 정교한 세부 묘사와 상징이 가득한 결혼 초상화.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Van_Eyck_-_Arnolfini_Portrait.jpg/640px-Van_Eyck_-_Arnolfini_Portrait.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Van_Eyck_-_Arnolfini_Portrait.jpg/2048px-Van_Eyck_-_Arnolfini_Portrait.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Van_Eyck_-_Arnolfini_Portrait.jpg'
+      },
+      {
+        id: 'moulin-galette',
+        title: '물랭 드 라 갈레트의 무도회',
+        titleEn: 'Bal du moulin de la Galette',
+        artist: 'Pierre-Auguste Renoir',
+        year: 1876,
+        category: 'impressionism',
+        desc: '햇살 가득한 파리 몽마르트르의 일요일 오후를 담은 르누아르의 대표작.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Pierre-Auguste_Renoir%2C_Le_Moulin_de_la_Galette.jpg/640px-Pierre-Auguste_Renoir%2C_Le_Moulin_de_la_Galette.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Pierre-Auguste_Renoir%2C_Le_Moulin_de_la_Galette.jpg/2048px-Pierre-Auguste_Renoir%2C_Le_Moulin_de_la_Galette.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Pierre-Auguste_Renoir,_Le_Moulin_de_la_Galette.jpg'
+      },
+      {
+        id: 'liberty-leading',
+        title: '민중을 이끄는 자유의 여신',
+        titleEn: 'Liberty Leading the People',
+        artist: 'Eugène Delacroix',
+        year: 1830,
+        category: 'romanticism',
+        desc: '7월 혁명을 기념하며 그려진 낭만주의의 대표작. 강렬한 색채와 역동성.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Eug%C3%A8ne_Delacroix_-_Le_28_Juillet._La_Libert%C3%A9_guidant_le_peuple.jpg/640px-Eug%C3%A8ne_Delacroix_-_Le_28_Juillet._La_Libert%C3%A9_guidant_le_peuple.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Eug%C3%A8ne_Delacroix_-_Le_28_Juillet._La_Libert%C3%A9_guidant_le_peuple.jpg/2048px-Eug%C3%A8ne_Delacroix_-_Le_28_Juillet._La_Libert%C3%A9_guidant_le_peuple.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Eug%C3%A8ne_Delacroix_-_Le_28_Juillet._La_Libert%C3%A9_guidant_le_peuple.jpg'
+      },
+      {
+        id: 'wanderer-fog',
+        title: '안개 바다 위의 방랑자',
+        titleEn: 'Wanderer above the Sea of Fog',
+        artist: 'Caspar David Friedrich',
+        year: 1818,
+        category: 'romanticism',
+        desc: '안개 낀 산봉우리 위에 서 있는 인물의 뒷모습. 독일 낭만주의의 상징.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/640px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/2048px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg'
+      },
+      {
+        id: 'self-portrait-vg',
+        title: '자화상',
+        titleEn: 'Self-Portrait',
+        artist: 'Vincent van Gogh',
+        year: 1889,
+        category: 'post-impressionism',
+        desc: '소용돌이치는 푸른 배경 속, 반 고흐가 자신을 직시한 후기 자화상.',
+        thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project_%28454045%29.jpg/640px-Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project_%28454045%29.jpg',
+        full: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project_%28454045%29.jpg/2048px-Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project_%28454045%29.jpg',
+        source: 'https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project_(454045).jpg'
       }
-      closeDeleteModal();
+    ];
+
+    const CATEGORIES = [
+      { id: 'all', label: '전체' },
+      { id: 'favorites', label: '⭐ 즐겨찾기' },
+      { id: 'post-impressionism', label: '후기인상주의' },
+      { id: 'impressionism', label: '인상주의' },
+      { id: 'renaissance', label: '르네상스' },
+      { id: 'baroque', label: '바로크' },
+      { id: 'romanticism', label: '낭만주의' },
+      { id: 'symbolism', label: '상징주의' },
+      { id: 'ukiyo-e', label: '우키요에' }
+    ];
+
+    const STORAGE_KEY = 'wallpaper_favs_v1';
+    let favorites = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+    let activeFilter = 'all';
+    let activeArtwork = null;
+    let activeDevice = 'phone';
+
+    // wsrv.nl 프록시 (Cloudflare 기반): 일부 네트워크에서 upload.wikimedia.org 접근이
+    // 막히거나 느린 경우를 우회. 원본 이미지는 그대로 서빙됨.
+    function proxied(url, width) {
+      const bare = url.replace(/^https?:\/\//, '');
+      const w = width ? `&w=${width}` : '';
+      return `https://wsrv.nl/?url=${encodeURIComponent(bare)}${w}`;
     }
 
-    // ESC로 모달 닫기
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeDeleteModal();
-    });
+    const gallery = document.getElementById('gallery');
+    const filterPills = document.getElementById('filterPills');
+    const searchInput = document.getElementById('searchInput');
+    const modal = document.getElementById('modal');
+    const modalClose = document.getElementById('modalClose');
 
-    // 오버레이 클릭으로 모달 닫기
-    document.getElementById('deleteModal').addEventListener('click', e => {
-      if (e.target === e.currentTarget) closeDeleteModal();
-    });
-
-    function escapeHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
+    function saveFavs() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...favorites]));
     }
 
-    function formatDate(ts) {
-      const d = new Date(ts);
-      const m = d.getMonth() + 1;
-      const day = d.getDate();
-      const h = d.getHours().toString().padStart(2, '0');
-      const min = d.getMinutes().toString().padStart(2, '0');
-      return `${m}/${day} ${h}:${min}`;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(showToast._tid);
+      showToast._tid = setTimeout(() => t.classList.remove('show'), 2200);
     }
 
-    function getMoveButtons(todo) {
-      const labels = { todo: '할 일', doing: '진행중', done: '완료' };
-      return STATUSES
-        .filter(s => s !== todo.status)
-        .map(s => `<button class="move-btn to-${s}" onclick="moveTo(${todo.id},'${s}')">${labels[s]}</button>`)
-        .join('');
+    function renderFilters() {
+      filterPills.innerHTML = CATEGORIES.map(c =>
+        `<button class="pill ${c.id === activeFilter ? 'active' : ''}" data-cat="${c.id}">${c.label}</button>`
+      ).join('');
+
+      filterPills.querySelectorAll('.pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeFilter = btn.dataset.cat;
+          renderFilters();
+          renderGallery();
+        });
+      });
     }
 
-    function updateStats() {
-      document.getElementById('statTotal').textContent = todos.length;
-      document.getElementById('statTodo').textContent = todos.filter(t => t.status === 'todo').length;
-      document.getElementById('statDoing').textContent = todos.filter(t => t.status === 'doing').length;
-      document.getElementById('statDone').textContent = todos.filter(t => t.status === 'done').length;
-    }
-
-    function render() {
-      STATUSES.forEach(status => {
-        const list = document.querySelector(`.card-list[data-status="${status}"]`);
-        const items = todos.filter(t => t.status === status);
-
-        document.querySelector(`[data-count="${status}"]`).textContent = items.length;
-
-        if (items.length === 0) {
-          list.innerHTML = '<li class="empty-state">항목이 없습니다</li>';
-          return;
+    function renderGallery() {
+      const q = searchInput.value.trim().toLowerCase();
+      let items = ARTWORKS.filter(a => {
+        if (activeFilter === 'favorites') {
+          if (!favorites.has(a.id)) return false;
+        } else if (activeFilter !== 'all' && a.category !== activeFilter) {
+          return false;
         }
-
-        list.innerHTML = items.map(t => `
-          <li class="card" draggable="true" data-id="${t.id}">
-            <div class="card-text">${escapeHtml(t.text)}</div>
-            <div class="card-meta">${formatDate(t.createdAt)}</div>
-            <div class="card-actions">
-              <div class="move-buttons">${getMoveButtons(t)}</div>
-              <button class="delete-btn" onclick="remove(${t.id})" title="삭제">&times;</button>
-            </div>
-          </li>
-        `).join('');
+        if (q) {
+          return (
+            a.title.toLowerCase().includes(q) ||
+            a.titleEn.toLowerCase().includes(q) ||
+            a.artist.toLowerCase().includes(q)
+          );
+        }
+        return true;
       });
 
-      updateStats();
-      initDragAndDrop();
-    }
+      if (items.length === 0) {
+        gallery.innerHTML = `<div class="empty">표시할 작품이 없습니다.<br><small>검색어나 필터를 바꿔보세요.</small></div>`;
+        return;
+      }
 
-    /* 드래그 앤 드롭 */
-    function initDragAndDrop() {
-      document.querySelectorAll('.card[draggable]').forEach(card => {
-        card.addEventListener('dragstart', e => {
-          e.dataTransfer.setData('text/plain', card.dataset.id);
-          e.dataTransfer.effectAllowed = 'move';
-          requestAnimationFrame(() => card.classList.add('dragging'));
-        });
-        card.addEventListener('dragend', () => {
-          card.classList.remove('dragging');
-          document.querySelectorAll('.column').forEach(c => c.classList.remove('drop-active'));
+      gallery.innerHTML = items.map(a => `
+        <div class="art-card" data-id="${a.id}">
+          <button class="fav-btn ${favorites.has(a.id) ? 'active' : ''}" data-fav="${a.id}" title="즐겨찾기">
+            ${favorites.has(a.id) ? '♥' : '♡'}
+          </button>
+          <div class="art-thumb">
+            <img src="${proxied(a.thumb, 640)}" alt="${a.title}" loading="lazy" referrerpolicy="no-referrer"
+                 data-fallback="${a.thumb}"
+                 onload="this.classList.add('loaded'); this.nextElementSibling.classList.add('hidden');"
+                 onerror="if(this.dataset.tried!=='1'){this.dataset.tried='1';this.src=this.dataset.fallback;}else{this.style.display='none';const s=this.nextElementSibling;s.innerHTML='<div class=&quot;thumb-error-icon&quot;>🖼️</div><div>이미지 로드 실패<br><small>탭하여 원본 열기</small></div>';}">
+            <div class="thumb-status"><div class="thumb-spinner"></div><div>불러오는 중…</div></div>
+          </div>
+          <div class="art-info">
+            <div class="art-title">${a.title}</div>
+            <div class="art-artist">${a.artist} · ${a.year}</div>
+          </div>
+        </div>
+      `).join('');
+
+      gallery.querySelectorAll('.art-card').forEach(card => {
+        card.addEventListener('click', e => {
+          if (e.target.closest('.fav-btn')) return;
+          openModal(card.dataset.id);
         });
       });
 
-      document.querySelectorAll('.column').forEach(col => {
-        col.addEventListener('dragover', e => {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = 'move';
-          col.classList.add('drop-active');
-        });
-        col.addEventListener('dragleave', e => {
-          if (!col.contains(e.relatedTarget)) {
-            col.classList.remove('drop-active');
-          }
-        });
-        col.addEventListener('drop', e => {
-          e.preventDefault();
-          col.classList.remove('drop-active');
-          const id = Number(e.dataTransfer.getData('text/plain'));
-          const status = col.dataset.status;
-          moveTo(id, status);
+      gallery.querySelectorAll('.fav-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          toggleFav(btn.dataset.fav);
         });
       });
     }
 
-    render();
+    function toggleFav(id) {
+      if (favorites.has(id)) {
+        favorites.delete(id);
+        showToast('즐겨찾기에서 제거되었습니다');
+      } else {
+        favorites.add(id);
+        showToast('즐겨찾기에 추가되었습니다');
+      }
+      saveFavs();
+      renderGallery();
+    }
+
+    function openModal(id) {
+      const art = ARTWORKS.find(a => a.id === id);
+      if (!art) return;
+      activeArtwork = art;
+      activeDevice = 'phone';
+
+      document.getElementById('infoTitle').textContent = `${art.title}`;
+      document.getElementById('infoArtist').textContent = `${art.artist}`;
+      document.getElementById('infoMeta').textContent = `${art.titleEn} · ${art.year} · 퍼블릭 도메인`;
+      document.getElementById('infoDesc').textContent = art.desc;
+      document.getElementById('deviceWallpaper').style.backgroundImage = `url('${proxied(art.full, 1280)}')`;
+
+      updatePreviewClock();
+      setDevice('phone');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+      activeArtwork = null;
+    }
+
+    function setDevice(device) {
+      activeDevice = device;
+      const frame = document.getElementById('deviceFrame');
+      frame.className = `device-frame ${device}`;
+      document.querySelectorAll('.device-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.device === device);
+      });
+    }
+
+    function updatePreviewClock() {
+      const now = new Date();
+      const hh = now.getHours().toString().padStart(2, '0');
+      const mm = now.getMinutes().toString().padStart(2, '0');
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      document.getElementById('previewClock').textContent = `${hh}:${mm}`;
+      document.getElementById('previewDate').textContent =
+        `${now.getMonth() + 1}월 ${now.getDate()}일 ${days[now.getDay()]}요일`;
+    }
+
+    async function downloadCurrent() {
+      if (!activeArtwork) return;
+      const art = activeArtwork;
+      showToast('다운로드를 시작합니다…');
+      // 프록시가 CORS 헤더를 제공하므로 blob 다운로드 성공률이 높음.
+      // 실패 시 원본 URL로 재시도 → 그래도 실패하면 새 탭에서 열기 폴백.
+      const tries = [proxied(art.full), art.full];
+      for (const src of tries) {
+        try {
+          const res = await fetch(src, { mode: 'cors' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${art.artist.replace(/\s+/g, '_')}_${art.titleEn.replace(/[^a-zA-Z0-9]+/g, '_')}.jpg`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          showToast('다운로드 완료! 갤러리에서 배경화면으로 설정하세요.');
+          return;
+        } catch (_) { /* 다음 URL 시도 */ }
+      }
+      window.open(proxied(art.full), '_blank', 'noopener');
+      showToast('새 탭에서 이미지를 길게 눌러 저장하세요');
+    }
+
+    /* 이벤트 바인딩 */
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    document.querySelectorAll('.device-tab').forEach(t => {
+      t.addEventListener('click', () => setDevice(t.dataset.device));
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', downloadCurrent);
+    document.getElementById('viewOriginalBtn').addEventListener('click', () => {
+      if (activeArtwork) window.open(activeArtwork.source, '_blank', 'noopener');
+    });
+
+    let searchTimer;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(renderGallery, 120);
+    });
+
+    setInterval(() => {
+      if (modal.classList.contains('active')) updatePreviewClock();
+    }, 30000);
+
+    renderFilters();
+    renderGallery();
   </script>
 </body>
 </html>
